@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace vixikhd\dragons\arena;
 
+use pocketmine\block\Block;
+use pocketmine\level\particle\DestroyBlockParticle;
 use pocketmine\math\Vector3;
 use pocketmine\utils\Random;
 use vixikhd\dragons\Dragons;
 use vixikhd\dragons\entity\EnderDragon;
+use vixikhd\dragons\entity\ThrownBlock;
 
 /**
  * Class DragonTargetManager
@@ -68,7 +71,22 @@ class DragonTargetManager {
      * @param int $z
      */
     public function removeBlock(EnderDragon $dragon, int $x, int $y, int $z): void {
-        $this->plugin->level->setBlockIdAt($x, $y, $z, 0); // Todo - animations
+        $blockPos = new Vector3($x, $y, $z);
+        $block = $this->plugin->level->getBlock($blockPos);
+        if($this->plugin->plugin->config["add-block-animation"] && $block->getId() !== 0 && $this->random->nextBoundedInt(10) === 0) {
+            $block = new ThrownBlock($this->plugin->level, ThrownBlock::createBaseNBT(new Vector3($x, $y, $z), $blockPos->subtract($dragon)->add(0, 0.4)->multiply(0.2), 0.0, 0.0, $this->plugin->level->getBlock($blockPos)));
+            $block->spawnToAll();
+        }
+
+        // Particles are too so op
+        if(!$this->plugin->plugin->config["add-block-animation"] && $block->getId() !== 0) {
+            // Still causes lag for some clients
+            if($this->random->nextBoundedInt(10) === 0)
+                $this->plugin->level->addParticle(new DestroyBlockParticle($blockPos->add(lcg_value(), lcg_value(), lcg_value()), $block));
+        }
+
+        $this->plugin->level->setBlock($blockPos, Block::get(Block::AIR));
+
         unset($this->blocks["$x:$y:$z"]);
 
         if($this->random->nextBoundedInt(500) === 0) {

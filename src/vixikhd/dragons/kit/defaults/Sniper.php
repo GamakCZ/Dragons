@@ -34,5 +34,7 @@ class Sniper implements Kit {
     public function sendKitContents(Player $player): void {
         $player->getInventory()->setItem(0, Item::get(ItemIds::BOW)->setCustomName("§r§eBow"));
         $player->getInventory()->setItem(9, Item::get(ItemIds::ARROW, 0, 16));
+
+        $player->getArmorInventory()->setBoots(Item::get(ItemIds::CHAIN_BOOTS));
     }
 }

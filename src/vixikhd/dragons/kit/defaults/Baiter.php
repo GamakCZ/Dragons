@@ -26,12 +26,14 @@ class Baiter implements Kit {
      */
     public function sendKitContents(Player $player): void {
         $player->getInventory()->setItem(0, Item::get(ItemIds::EMERALD)->setCustomName("§r§eBait\n§7[Use]"));
+
+        $player->getArmorInventory()->setBoots(Item::get(ItemIds::GOLD_BOOTS));
     }
 
     /**
      * @return string
      */
     public function getDescription(): string {
-        return "Gives player an emerald for baiting dragons";
+        return "Gives you bait for dragons";
     }
 }

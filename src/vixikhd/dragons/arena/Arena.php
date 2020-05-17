@@ -9,12 +9,17 @@ use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
+use pocketmine\event\entity\EntityLevelChangeEvent;
 use pocketmine\event\inventory\CraftItemEvent;
+use pocketmine\event\inventory\InventoryPickupItemEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerDropItemEvent;
 use pocketmine\event\player\PlayerExhaustEvent;
 use pocketmine\event\player\PlayerInteractEvent;
+use pocketmine\event\player\PlayerItemHeldEvent;
+use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\item\Item;
+use pocketmine\item\ItemIds;
 use pocketmine\level\Level;
 use pocketmine\level\Position;
 use pocketmine\math\Vector3;
@@ -55,6 +60,9 @@ class Arena implements Listener {
     public $players = [];
     /** @var Player[] $spectators */
     public $spectators = [];
+
+    /** @var Player[] $leaving */
+    public $leaving = [];
 
     /**
      * Arena constructor.
@@ -98,7 +106,7 @@ class Arena implements Listener {
             $player->sendMessage(Lang::getPrefix() . Lang::getMessage("arena-full"));
             return false;
         }
-        if($this->scheduler->phase > 0) {
+        if($this->scheduler->phase > 0 || $this->scheduler->startTime <= 6) {
             $player->sendMessage(Lang::getPrefix() . Lang::getMessage("arena-ingame"));
             return false;
         }
@@ -111,6 +119,8 @@ class Arena implements Listener {
         $player->extinguish();
         $player->teleport($this->plugin->getServer()->getLevelByName($this->data["lobby"])->getSpawnLocation());
 
+        $player->setGamemode($player::ADVENTURE);
+
         $player->getInventory()->clearAll();
         $player->getArmorInventory()->clearAll();
         $player->getCursorInventory()->clearAll();
@@ -118,14 +128,22 @@ class Arena implements Listener {
         $player->getInventory()->setItem(7, Item::get(Item::FEATHER)->setCustomName("§r§eSelect kit\n§7[Use]"));
         $player->getInventory()->setItem(8, Item::get(Item::BED)->setCustomName("§r§eLeave the game\n§7[Use]"));
 
-        $this->broadcastMessage("§8Join> §7{$player->getName()}");
+        $this->broadcastMessage(Lang::getMessage("join", [$player->getName()]));
         return true;
     }
 
     /**
      * @param Player $player
+     * @param bool $findNewGame
      */
-    public function disconnectPlayer(Player $player) {
+    public function disconnectPlayer(Player $player, bool $findNewGame = false) {
+        $this->broadcastMessage(Lang::getMessage("quit", [$player->getName()]));
+
+        if(isset($this->players[$player->getName()]))
+            unset($this->players[$player->getName()]);
+        if(isset($this->spectators[$player->getName()]))
+            unset($this->spectators[$player->getName()]);
+
         $player->setHealth(20);
         $player->setMaxHealth(20);
         $player->setFood(20);
@@ -140,10 +158,12 @@ class Arena implements Listener {
 
         ScoreboardBuilder::removeBoard($player);
 
-        if(isset($this->players[$player->getName()]))
-            unset($this->players[$player->getName()]);
-        if(isset($this->spectators[$player->getName()]))
-            unset($this->spectators[$player->getName()]);
+        if($findNewGame) {
+            $arena = $this->plugin->emptyArenaChooser->getRandomArena();
+            if($arena !== null && $arena->joinToArena($player)) {
+                return;
+            }
+        }
 
         if($this->plugin->config["waterdog"]["enabled"]) {
             $lobby = $this->plugin->config["waterdog"]["lobby"] ?? null;
@@ -194,6 +214,9 @@ class Arena implements Listener {
                 $player->getArmorInventory()->clearAll();
                 $player->getCursorInventory()->clearAll();
 
+                $player->getInventory()->setItem(7, Item::get(Item::MOB_HEAD, 3)->setCustomName("§r§eRandom teleport\n§7[Use]"));
+                $player->getInventory()->setItem(8, Item::get(Item::BED)->setCustomName("§r§eLeave the game\n§7[Use]"));
+
                 $player->setGamemode($player::SPECTATOR);
 
                 $player->addTitle(Lang::getMessage("spectating"));
@@ -212,6 +235,87 @@ class Arena implements Listener {
 
         if($this->scheduler->phase === 2) {
             $event->setCancelled(true);
+        }
+    }
+
+    /**
+     * @param PlayerQuitEvent $event
+     */
+    public function onQuit(PlayerQuitEvent $event) {
+        $player = $event->getPlayer();
+
+        if(isset($this->players[$player->getName()]) || isset($this->spectators[$player->getName()])) {
+            $this->disconnectPlayer($player);
+        }
+    }
+
+    /**
+     * @param EntityLevelChangeEvent $event
+     */
+    public function onLevelChange(EntityLevelChangeEvent $event) {
+        $player = $event->getEntity();
+        if(!$player instanceof Player) {
+            return;
+        }
+
+        if(!isset($this->players[$player->getName()]) && !isset($this->spectators[$player->getName()])) {
+            return;
+        }
+
+        switch ($this->scheduler->phase) {
+            case 0:
+                if($event->getTarget()->getName() === $this->data["lobby"]) {
+                    break;
+                }
+                if($this->level === null && $event->getTarget()->getName() !== $this->data["lobby"]) {
+                    $this->disconnectPlayer($player);
+                    break;
+                }
+
+                if($event->getTarget()->getId() !== $this->level->getId()) {
+                    $this->disconnectPlayer($player);
+                }
+                break;
+            case 2:
+            case 1:
+                $this->disconnectPlayer($player);
+                break;
+        }
+    }
+
+    /**
+     * @param PlayerItemHeldEvent $event
+     */
+    public function onHeld(PlayerItemHeldEvent $event) {
+        $player = $event->getPlayer();
+
+        if(!isset($this->spectators[$player->getName()])) {
+            return;
+        }
+
+        switch ($event->getItem()->getId()) {
+            case ItemIds::MOB_HEAD:
+                $event->setCancelled(true);
+                if(count($this->players) === 0) {
+                    $player->sendMessage(Lang::getGamePrefix() . Lang::getMessage("no-players"));
+                }
+
+                $playing = array_values($this->players);
+                $randomPlaying = $playing[array_rand($playing, 1)];
+
+                $player->teleport($randomPlaying);
+                $player->sendMessage(Lang::getGamePrefix() . Lang::getMessage("random-tp", [$randomPlaying->getName()]));
+                break;
+            case ItemIds::BED:
+                $event->setCancelled(true);
+                if(!isset($this->leaving[$player->getName()])) {
+                    $this->leaving[$player->getName()] = 0;
+                    $player->sendMessage(Lang::getGamePrefix() . Lang::getMessage("leave-confirm"));
+                    break;
+                }
+
+                $this->disconnectPlayer($player);
+                break;
         }
     }
 
@@ -259,6 +363,7 @@ class Arena implements Listener {
                             KitUseTimer::addToQueue($player);
                             $player->setMotion($player->getDirectionVector()->add(0, 0.2)->multiply(1.2));
                             Effects::spawnEffect(Effects::LEAP_BOOST, $player);
+                            $player->resetFallDistance();
                             break;
                         }
 
@@ -322,17 +427,40 @@ class Arena implements Listener {
     }
 
     /**
+     * @param InventoryPickupItemEvent $event
+     */
+    public function onPickup(InventoryPickupItemEvent $event) {
+        foreach ($event->getInventory()->getViewers() as $viewer) {
+            if(isset($this->players[$viewer->getName()]) || isset($this->spectators[$viewer->getName()])) {
+                $event->setCancelled(true);
+                $event->getItem()->flagForDespawn();
+                break;
+            }
+        }
+    }
+
+    /**
      * @param PlayerExhaustEvent $event
      */
     public function onExhaust(PlayerExhaustEvent $event) {
         if(isset($this->players[$event->getPlayer()->getName()]) || isset($this->spectators[$event->getPlayer()->getName()])) {
-            $event->setCancelled(true);
+            $event->getPlayer()->setFood(20); // Event->setCancelled doesn't work ._.
+//            $event->setCancelled(true);
         }
+    }
+
+    public function teleportPlayers() {
+        foreach ($this->players as $player) {
+            $player->teleport(Position::fromObject($this->data["spawns"][array_rand($this->data["spawns"], 1)], $this->level));
+            $player->setImmobile(true);
+            $player->setGamemode($player::ADVENTURE);
+        }
+
+        $this->broadcastMessage(Lang::getGamePrefix() . Lang::getMessage("spawn-start"));
     }
 
     public function startGame() {
         foreach ($this->players as $player) {
-            $player->teleport(Position::fromObject($this->data["spawns"][array_rand($this->data["spawns"], 1)],  $this->level));
             $player->addTitle(Lang::getMessage("started"), " ");
             $player->setGamemode($player::ADVENTURE);
 

@@ -12,12 +12,18 @@ waterdog:
   # Server to which should we transfer players after game end
   lobby: Lobby-1
 
+# Blocks level events - experimental (cancels leaves decaying, set all farmlands under water)
+cancel-level-events: false
+# Experimental - adds block animation, causes high lag, also with good processor, recommended to leave it disabled
+add-block-animation: false
+
 # I hope I will have time for adding some messages here
 messages:
+  # Prefixes
   prefix: '§9Dragons>'
   prefix-game: '§9Game>'
   prefix-kits: '§9Kits>'
-
+  # Messages
   arena-full: '§6Arena is full!'
   arena-ingame: '§cArena is in game!'
   spectating: '§6You are now spectating!'
@@ -34,6 +40,12 @@ messages:
   starting: '§aStarting the game in §l{%0}'
   dragon-spawned: '§aA new dragon is on his way!'
   restarting: '§aDisconnecting...'
+  spawn-start: '§aDragons starts spawning in 5 seconds!'
+  no-players: '§cThere are not any players in the arena.'
+  random-tp: '§aYou were randomly teleported to {%0}!'
+  leave-confirm: '§6Do you really wanna left the game?'
+  join: '§8Join> §7{%0}'
+  quit: '§8Quit> §7{%0}'
 
 # Scoreboard settings
 scoreboards:
@@ -56,7 +68,7 @@ scoreboards:
       - '§fKit: §a{%kit}'
       - ''
       - '§fMap: §a{%map}'
-      - '§fStarting in: §a{%startTime}...'
+      - '§fStarting in: §a{%startTime}'
       - ''
       - '§eIP: mc.bedrockplay.eu'
     playing:
@@ -66,7 +78,7 @@ scoreboards:
       - '§fKit: §a{%kit}'
       - ''
       - '§fMap: §a{%map}'
-      - '§fTime: §a{%gameTime}...'
+      - '§fTime: §a{%gameTime}'
       - ''
       - '§eIP: mc.bedrockplay.eu'
     restarting:
@@ -76,7 +88,7 @@ scoreboards:
       - '§fKit: §a{%kit}'
       - ''
       - '§fMap: §a{%map}'
-      - '§fTime: §a{%restartTime}...'
+      - '§fStarting new game in: §a{%restartTime}'
       - ''
       - '§eIP: mc.bedrockplay.eu'
 ...

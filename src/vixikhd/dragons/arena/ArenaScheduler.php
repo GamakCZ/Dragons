@@ -38,6 +38,9 @@ class ArenaScheduler extends Task {
     /** @var int $restartTime */
     public $restartTime = self::RESTART_TIME;
 
+    /** @var bool $forceStart */
+    public $forceStart = false;
+
     /**
      * ArenaScheduler constructor.
      * @param Arena $plugin
@@ -55,16 +58,27 @@ class ArenaScheduler extends Task {
 
         switch ($this->phase) {
             case 0:
-                if(count($this->plugin->players) < self::PLAYERS_TO_START) { // TODO - Change min players to start
+                if(count($this->plugin->players) < self::PLAYERS_TO_START && !$this->forceStart) {
                     $this->plugin->broadcastTip(Lang::getMessage("waiting", [(string)count($this->plugin->players), $this->plugin->data["slots"]]));
                     break;
                 }
                 $this->plugin->broadcastTip(Lang::getMessage("starting", [gmdate("i:s", $this->startTime)]));
-                $this->startTime--;
+
+                if($this->startTime == 5) {
+                    $this->plugin->teleportPlayers();
+                }
+
+                if($this->startTime == 4) {
+                    foreach ($this->plugin->players as $player) {
+                        $player->setImmobile(false);
+                    }
+                }
 
                 if($this->startTime <= 0) {
                     $this->plugin->startGame();
                 }
+
+                $this->startTime--;
                 break;
             case 1:
                 $this->plugin->checkEnd();
@@ -76,16 +90,16 @@ class ArenaScheduler extends Task {
                 $this->gameTime++;
                 break;
             case 2:
-                if($this->restartTime < 0) {
+                if($this->restartTime == 0) {
                     $this->plugin->broadcastMessage(Lang::getGamePrefix() . Lang::getMessage("restarting"));
 
                     $players = $this->plugin->players + $this->plugin->spectators;
                     foreach ($players as $player) {
-                        $this->plugin->disconnectPlayer($player);
+                        $this->plugin->disconnectPlayer($player, true);
                     }
                 }
 
-                if($this->restartTime == 0) {
+                if($this->restartTime == -2) {
                     $this->plugin->mapReset->loadMap($this->plugin->level->getFolderName());
                 }
 
@@ -230,5 +244,7 @@ class ArenaScheduler extends Task {
         $this->restartTime = self::RESTART_TIME;
 
         $this->phase = 0;
+
+        $this->forceStart = false;
     }
 }

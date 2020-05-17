@@ -50,7 +50,7 @@ class EmptyArenaChooser {
 
         //2.
         foreach ($availableArenas as $index => $arena) {
-            if($arena->scheduler->phase !== 0) {
+            if($arena->scheduler->phase !== 0 || $arena->scheduler->startTime <= 6) {
                 unset($availableArenas[$index]);
             }
         }

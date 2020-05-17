@@ -48,7 +48,7 @@ class LeapBoost extends Task {
             sin(deg2rad(($this->player->getYaw() + 180) % 360))),
             $this->player->getLevel()));
 
-        if(($this->player->isOnGround() && $this->particleTick > 2) || $this->player->getY() < 10 || $this->player->getGamemode() === $this->player::SPECTATOR) {
+        if(($this->player->isOnGround() && $this->particleTick > 7) || $this->player->getY() < 10 || $this->player->getGamemode() === $this->player::SPECTATOR) {
             Dragons::getInstance()->getScheduler()->cancelTask($this->getTaskId());
         }
 
@@ -60,8 +60,8 @@ class LeapBoost extends Task {
      */
     public function spawnParticle(Position $pos) {
         if($pos->getLevel() instanceof Level) {
-            $pos->getLevel()->addParticle(new CustomParticle(CustomParticle::FLAME, $pos->subtract(0.001, 0, 0.001)));
-            $pos->getLevel()->addParticle(new CustomParticle(CustomParticle::FLAME, $pos->add(0.001, 0, 0.001)));
+            $pos->getLevel()->addParticle(new CustomParticle(CustomParticle::FLAME, $pos->subtract(0.05, 0, 0.05)));
+            $pos->getLevel()->addParticle(new CustomParticle(CustomParticle::FLAME, $pos->add(0.05, 0, 0.05)));
         }
     }
 }

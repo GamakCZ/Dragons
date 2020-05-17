@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace vixikhd\dragons;
 
 use pocketmine\block\Block;
+use pocketmine\block\BlockFactory;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\entity\Entity;
 use pocketmine\event\block\BlockBreakEvent;
+use pocketmine\event\block\LeavesDecayEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerChatEvent;
 use pocketmine\event\player\PlayerJoinEvent;
@@ -19,12 +21,13 @@ use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\tile\Sign;
 use vixikhd\dragons\arena\Arena;
+use vixikhd\dragons\block\Farmland;
 use vixikhd\dragons\entity\EggBait;
 use vixikhd\dragons\entity\EnderDragon;
+use vixikhd\dragons\entity\ThrownBlock;
 use vixikhd\dragons\kit\KitManager;
 use vixikhd\dragons\task\KitUseTimer;
 use vixikhd\dragons\utils\ServerManager;
-
 
 /**
  * Class Dragons
@@ -58,6 +61,7 @@ class Dragons extends PluginBase implements Listener {
     public function onEnable() {
         Entity::registerEntity(EnderDragon::class);
         Entity::registerEntity(EggBait::class);
+        Entity::registerEntity(ThrownBlock::class);
 
         self::$instance = $this;
 
@@ -70,7 +74,11 @@ class Dragons extends PluginBase implements Listener {
         $this->kitManager = new KitManager($this);
         $this->kitTimer = new KitUseTimer($this);
 
-        $this->getScheduler()->scheduleRepeatingTask($this->kitTimer, 10);
+        if($this->config["cancel-level-events"]) {
+            BlockFactory::registerBlock(new Farmland(), true);
+        }
+
+        $this->getScheduler()->scheduleRepeatingTask($this->kitTimer, 2);
 
         $this->loadArenas();
     }
@@ -168,13 +176,60 @@ class Dragons extends PluginBase implements Listener {
                     "§a/dg help : Displays help\n".
                     "§a/dg create : Creates an arena\n".
                     "§a/dg list : Displays list of available arenas\n".
-                    "§a/dg remove : Removes an arena");
+                    "§a/dg remove : Removes an arena\n".
+                    "§a/dg start : Force starts a game");
                 break;
             case "create":
                 $sender->sendMessage("§a> Arena created!");
                 $this->setup[$sender->getName()] = [];
                 $sender->sendMessage("§6> Go to lobby level and write something to chat!");
                 break;
+            case "list":
+                $arenas = array_map(function ($arena) {
+                    /** @var Arena $arena */
+                    return $arena->level === null ? "Unknown" : $arena->level->getName();
+                }, $this->arenas);
+
+                $lines = [];
+                foreach ($arenas as $index => $levelName) {
+                    $lines[] = "§7Arena num. §l$index §r§8(Level $levelName)";
+                }
+
+                $sender->sendMessage("§a> Available arenas:\n" . implode("\n", $lines));
+                break;
+            case "remove":
+                if(!isset($args[1]) || !is_numeric($args[1])) {
+                    $sender->sendMessage("§cUsage: §7/dg remove <arenaNum.>");
+                    break;
+                }
+
+                $arenaNum = (int)$args[1];
+                if(!isset($this->arenas[$arenaNum])) {
+                    $sender->sendMessage("§c> Arena with number $arenaNum was not found.");
+                    break;
+                }
+
+                if(!isset($args[2]) || $args[2] != "confirm") {
+                    $sender->sendMessage("§6> Do you really want to remove that arena?");
+                    $sender->sendMessage("§6> Type §l/dg remove {$arenaNum} confirm§r§6 to confirm.");
+                    break;
+                }
+
+                $this->getScheduler()->cancelTask($this->arenas[$arenaNum]->scheduler->getTaskId());
+                unlink($this->getDataFolder() . "arenas/{$this->arenas[$arenaNum]->data["level"]}.yml");
+                unset($this->arenas[$arenaNum]);
+                $sender->sendMessage("§a> Arena successfully removed!");
+                break;
+            case "start":
+                $arena = $this->getArenaByPlayer($sender);
+                if($arena === null) {
+                    $sender->sendMessage("§c> Join the arena first!");
+                    break;
+                }
+
+                $arena->scheduler->startTime = 10;
+                $arena->scheduler->forceStart = true;
+                $sender->sendMessage("§a> Starting the game...");
 
         }
         return false;
@@ -338,6 +393,15 @@ class Dragons extends PluginBase implements Listener {
 
                 unset($this->setup[$player->getName()]);
                 break;
+        }
+    }
+
+    /**
+     * @param LeavesDecayEvent $event
+     */
+    public function onDecay(LeavesDecayEvent $event) {
+        if($this->config["cancel-level-events"]) {
+            $event->setCancelled(true);
         }
     }
 

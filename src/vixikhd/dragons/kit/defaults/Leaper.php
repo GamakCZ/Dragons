@@ -26,6 +26,8 @@ class Leaper implements Kit {
      */
     public function sendKitContents(Player $player): void {
         $player->getInventory()->setItem(0, Item::get(ItemIds::IRON_AXE)->setCustomName("§r§eLeap\n§7[Use]"));
+
+        $player->getArmorInventory()->setBoots(Item::get(ItemIds::IRON_BOOTS));
     }
 
     /**

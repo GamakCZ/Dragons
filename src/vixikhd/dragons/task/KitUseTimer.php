@@ -54,7 +54,7 @@ class KitUseTimer extends Task {
         foreach (self::$queue as $name => $tick) {
             $player = self::$players[$name];
 
-            if($tick === 10) {
+            if($tick === 40) {
                 $player->sendMessage(Lang::getKitsPrefix() . "§aYou can use your kit again!");
                 $player->sendPopup("§aKit Recharged!");
 
@@ -63,9 +63,9 @@ class KitUseTimer extends Task {
                 continue;
             }
 
-            $progress = "§6Recharging the kit...\n§a";
-            for($i = 0; $i < 10; $i++) {
-                $progress .= ($i == $tick ? "§c||" : "||");
+            $progress = "§7Recharging the kit...\n§a";
+            for($i = 0; $i < 40; $i++) {
+                $progress .= ($i == $tick ? "§c|" : "|");
             }
             $player->sendPopup($progress);
 
