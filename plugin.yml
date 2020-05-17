@@ -1,0 +1,11 @@
+name: Dragons
+api: 3.0.0
+main: vixikhd\dragons\Dragons
+version: 1.0.0
+description: Dragons minigame plugin
+author: Vix
+
+commands:
+  dragons:
+    description: Dragons commands
+    aliases: [dg]

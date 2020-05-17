@@ -1,0 +1,82 @@
+---
+# Dragons configuration file
+# This plugin was created because of PatarHD Youtuber, sub to him for more awesome plugins!
+
+# Don't change config version!
+config-version: '1.0.0'
+
+# This option autoconnects players when join, it also disables signs
+waterdog:
+  # true -> enabled; false -> disabled
+  enabled: false
+  # Server to which should we transfer players after game end
+  lobby: Lobby-1
+
+# I hope I will have time for adding some messages here
+messages:
+  prefix: '§9Dragons>'
+  prefix-game: '§9Game>'
+  prefix-kits: '§9Kits>'
+
+  arena-full: '§6Arena is full!'
+  arena-ingame: '§cArena is in game!'
+  spectating: '§6You are now spectating!'
+  death: '§9Death> §7{%0}'
+  kits-delay: '§cYou cannot use this kit right now!'
+  started: '§aGame started!'
+  congratulation: '§aCONGRATULATION!'
+  congratulation-subtitle: '§7You have won the game!'
+  win: '§7Player §a{%0}§7 has won the game at {%1}'
+  kit-form-title: 'Select a kit'
+  kit-form-subtitle: 'Kick the button to select a kit'
+  kit-selected: '§aSelected kit {%0}!'
+  waiting: '§cWaiting for players §l({%0}/{%1})'
+  starting: '§aStarting the game in §l{%0}'
+  dragon-spawned: '§aA new dragon is on his way!'
+  restarting: '§aDisconnecting...'
+
+# Scoreboard settings
+scoreboards:
+  enabled: true
+  formats:
+    waiting:
+      - '§e§lDRAGONS'
+      - ''
+      - '§fPlayers: §a{%players}/{%maxPlayers}'
+      - '§fKit: §a{%kit}'
+      - ''
+      - '§fMap: §a{%map}'
+      - '§fWaiting for players...'
+      - ''
+      - '§eIP: mc.bedrockplay.eu'
+    starting:
+      - '§e§lDRAGONS'
+      - ''
+      - '§fPlayers: §a{%players}/{%maxPlayers}'
+      - '§fKit: §a{%kit}'
+      - ''
+      - '§fMap: §a{%map}'
+      - '§fStarting in: §a{%startTime}...'
+      - ''
+      - '§eIP: mc.bedrockplay.eu'
+    playing:
+      - '§e§lDRAGONS'
+      - ''
+      - '§fPlayers: §a{%players}'
+      - '§fKit: §a{%kit}'
+      - ''
+      - '§fMap: §a{%map}'
+      - '§fTime: §a{%gameTime}...'
+      - ''
+      - '§eIP: mc.bedrockplay.eu'
+    restarting:
+      - '§e§lDRAGONS'
+      - ''
+      - '§fPlayers: §a{%players}'
+      - '§fKit: §a{%kit}'
+      - ''
+      - '§fMap: §a{%map}'
+      - '§fTime: §a{%restartTime}...'
+      - ''
+      - '§eIP: mc.bedrockplay.eu'
+...
