@@ -89,9 +89,7 @@ class DragonTargetManager {
 
         unset($this->blocks["$x:$y:$z"]);
 
-        if($this->random->nextBoundedInt(500) === 0) {
-            $dragon->lookAt($this->getDragonTarget());
-        }
+        $dragon->changeRotation(true);
     }
 
     public function addDragon(): void {

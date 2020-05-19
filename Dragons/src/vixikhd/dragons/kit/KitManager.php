@@ -8,6 +8,7 @@ use pocketmine\Player;
 use vixikhd\dragons\Dragons;
 use vixikhd\dragons\form\SimpleForm;
 use vixikhd\dragons\kit\defaults\Baiter;
+use vixikhd\dragons\kit\defaults\Builder;
 use vixikhd\dragons\kit\defaults\Kit;
 use vixikhd\dragons\kit\defaults\Leaper;
 use vixikhd\dragons\kit\defaults\Sniper;
@@ -40,6 +41,7 @@ class KitManager {
         $this->kits[] = new Leaper(); // default kit
 
         $this->kits[] = new Baiter();
+        $this->kits[] = new Builder();
         $this->kits[] = new Sniper();
     }
 

@@ -50,13 +50,9 @@ class Math {
             for($x = $minX; $x <= $maxX; ++$x){
                 for($y = $minY; $y <= $maxY; ++$y) {
                     $block = $level->getBlockAt($x, $y, $z);
-                    foreach ($block->getCollisionBoxes() as $blockBB) {
-                        if ($blockBB->intersectsWith($bb)) {
-                            $collides[] = $block;
-                            break;
-                        }
+                    if($bb->isVectorInside($block)) {
+                        $collides[] = $block;
                     }
-
                 }
             }
         }

@@ -35,6 +35,17 @@ class EnderDragon extends Living {
     /** @var float $height */
     public $height = 4.0;
 
+    /** @var bool $isRotating */
+    public $isRotating = false;
+    /** @var int $rotationTicks */
+    public $rotationTicks = 0;
+    /** @var float $lastRotation */
+    public $lastRotation = 0.0;
+    /** @var int $rotationChange */
+    public $rotationChange; // from 5 to 10 (- or +)
+    /** @var int $pitchChange */
+    public $pitchChange;
+
     /**
      * EnderDragon constructor.
      *
@@ -49,6 +60,37 @@ class EnderDragon extends Living {
         }
 
         $this->targetManager = $targetManager;
+    }
+
+    public function changeRotation(bool $canStart = false) {
+        // checks for new rotation
+        if(!$this->isRotating) {
+            if(!$canStart) {
+                return;
+            }
+
+            if(microtime(true)-$this->lastRotation < 10) {
+                return;
+            }
+
+            $this->rotationChange = mt_rand(5, 30);
+            if(mt_rand(0, 1) === 0) {
+                $this->rotationChange *= -1;
+            }
+            $this->pitchChange = mt_rand(-4, 4);
+
+            $this->isRotating = true;
+        }
+
+        // checks for rotation cancel
+        if($this->rotationTicks > mt_rand(5, 8)) {
+            $this->lastRotation = microtime(true);
+            $this->isRotating = false;
+            return;
+        }
+
+        $this->setRotation(($this->getYaw() + ($this->rotationChange / 3)) % 360, ($this->getPitch() + ($this->pitchChange / 10)) % 360);
+        $this->rotationTicks++;
     }
 
     /**
@@ -68,6 +110,7 @@ class EnderDragon extends Living {
             return true;
         }
 
+        $this->changeRotation();
         $this->setMotion($this->getDirectionVector());
 
         return $return;
@@ -120,10 +163,6 @@ class EnderDragon extends Living {
 
                 $this->boundingBox->setBB($axisalignedbb);
 
-//                $list = $this->level->getCollisionCubes($this, $this->boundingBox->addCoord($dx, $dy, $dz), false);
-//                foreach ($list as $bb) {
-//                    $this->targetManager->removeBlock($this, (int)$bb->minX, (int)$bb->minY, (int)$bb->minZ);
-//                }
                 foreach (Math::getCollisionBlocks($this->level, $this->boundingBox->addCoord($dx, $dy, $dz)) as $block) {
                     $this->targetManager->removeBlock($this, $block->getX(), $block->getY(), $block->getZ());
                 }
@@ -226,8 +265,10 @@ class EnderDragon extends Living {
         parent::onCollideWithPlayer($player);
     }
 
-    public function setOnFire(int $seconds): void {
-    }
+    /**
+     * @param int $seconds
+     */
+    public function setOnFire(int $seconds): void {}
 
     /**
      * @return string

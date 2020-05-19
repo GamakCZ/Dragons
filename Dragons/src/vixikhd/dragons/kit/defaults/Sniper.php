@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace vixikhd\dragons\kit\defaults;
 
+use pocketmine\item\enchantment\Enchantment;
+use pocketmine\item\enchantment\EnchantmentInstance;
 use pocketmine\item\Item;
 use pocketmine\item\ItemIds;
 use pocketmine\Player;
@@ -35,6 +37,8 @@ class Sniper implements Kit {
         $player->getInventory()->setItem(0, Item::get(ItemIds::BOW)->setCustomName("§r§eBow"));
         $player->getInventory()->setItem(9, Item::get(ItemIds::ARROW, 0, 16));
 
-        $player->getArmorInventory()->setBoots(Item::get(ItemIds::CHAIN_BOOTS));
+        $boots = Item::get(ItemIds::CHAIN_BOOTS);
+        $boots->addEnchantment(new EnchantmentInstance(Enchantment::getEnchantment(Enchantment::FEATHER_FALLING), 4));
+        $player->getArmorInventory()->setBoots($boots);
     }
 }

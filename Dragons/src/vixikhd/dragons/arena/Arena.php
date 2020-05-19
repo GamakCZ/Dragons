@@ -27,6 +27,7 @@ use pocketmine\network\mcpe\protocol\LevelSoundEventPacket;
 use pocketmine\Player;
 use vixikhd\dragons\Dragons;
 use vixikhd\dragons\effects\Effects;
+use vixikhd\dragons\effects\kit\BridgeEffect;
 use vixikhd\dragons\entity\EggBait;
 use vixikhd\dragons\Lang;
 use vixikhd\dragons\math\Math;
@@ -381,6 +382,16 @@ class Arena implements Listener {
 
                         $player->sendMessage(Lang::getKitsPrefix() . Lang::getMessage("kits-delay"));
                         break;
+                    case Item::BONE:
+                        if(KitUseTimer::canUseKit($player)) {
+                            KitUseTimer::addToQueue($player);
+
+                            new BridgeEffect($player);
+                            break;
+                        }
+
+                        $player->sendMessage(Lang::getKitsPrefix() . Lang::getMessage("kits-delay"));
+                        break;
                     case Item::BED:
                         $this->disconnectPlayer($player);
                         break;
@@ -475,6 +486,8 @@ class Arena implements Listener {
             unset($this->dragonTargetManager);
         }
         $this->dragonTargetManager = new DragonTargetManager($this, $this->data["blocks"], Math::calculateCenterPosition($this->data["corner1"], $this->data["corner2"]));
+        $this->dragonTargetManager->addDragon();
+        $this->dragonTargetManager->addDragon(); // +1 dragon from scheduler
 
         $this->scheduler->phase++;
     }
