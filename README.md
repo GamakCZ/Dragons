@@ -7,7 +7,7 @@
 	<a href="https://github.com/GamakCZ/Dragons/blob/master/LICENSE">
 	       <img src="https://img.shields.io/github/license/GamakCZ/Dragons?style=for-the-badge" alt="license">
 	</a>
-	<a href="https://poggit.pmmp.io/ci/GamakCZ/Draons/Dragons">
+	<a href="https://poggit.pmmp.io/ci/GamakCZ/Dragons/Dragons">
 	        <img src="https://poggit.pmmp.io/ci.shield/GamakCZ/Dragons/Dragons?style=for-the-badge" alt="poggit-ci">
 	</a>
 <br><br>
