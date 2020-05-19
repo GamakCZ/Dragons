@@ -62,7 +62,7 @@ class Arena implements Listener {
     /** @var Player[] $spectators */
     public $spectators = [];
 
-    /** @var Player[] $leaving */
+    /** @var int[] $leaving */
     public $leaving = [];
 
     /**
@@ -493,6 +493,7 @@ class Arena implements Listener {
     }
 
     public function endGame() {
+        /** @var Player $winner */
         $winner = null;
         foreach ($this->players as $player) {
             $winner = $player;
@@ -505,7 +506,7 @@ class Arena implements Listener {
         }
 
         $winner->addTitle(Lang::getMessage("congratulation"), Lang::getMessage("congratulation-subtitle"));
-        $this->plugin->getServer()->broadcastMessage(Lang::getPrefix() . Lang::getMessage("win", [$player->getName(), $this->level->getName()]));
+        $this->plugin->getServer()->broadcastMessage(Lang::getPrefix() . Lang::getMessage("win", [$winner->getName(), $this->level->getName()]));
         $this->scheduler->phase++;
     }
 

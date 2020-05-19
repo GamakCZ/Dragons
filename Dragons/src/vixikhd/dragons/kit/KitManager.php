@@ -58,7 +58,7 @@ class KitManager {
 
     /**
      * @param Player $player
-     * @param $data
+     * @param mixed $data
      */
     public function handleKitSelect(Player $player, $data) {
         if(is_null($data) || !is_int($data)) {

@@ -20,11 +20,11 @@ class DragonTargetManager {
 
     public const MAX_DRAGON_MID_DIST = 64; // Dragon will rotate when will be distanced 64 blocks from map center
 
-    /** @var Dragons $plugin */
+    /** @var Arena $plugin */
     public $plugin;
-    /** @var Vector3 $blocks */
+    /** @var Vector3[] $blocks */
     public $blocks = [];
-    /** @var Vector3 $baits */
+    /** @var Vector3[] $baits */
     public $baits = [];
     /** @var Vector3 $mid */
     public $mid; // Used when all the blocks the are broken
@@ -60,7 +60,12 @@ class DragonTargetManager {
             return $pos;
         }
 
-        return empty($this->blocks) ? $this->mid : $this->blocks[array_rand($this->blocks, 1)];
+        if(empty($this->blocks)) {
+            return $this->mid;
+        }
+
+        $blocks = array_values($this->blocks);
+        return empty($this->blocks) ? $this->mid : $blocks[array_rand($blocks, 1)];
     }
 
     /**
