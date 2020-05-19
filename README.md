@@ -1,5 +1,4 @@
 ![Picture](https://i.ibb.co/7C2wWMC/Dragons.png)
-
 <div align=center>
 	<a href="https://discord.gg/uwBf2jS">
 	        <img src="https://img.shields.io/discord/365202594932719616?color=blue&label=discord&style=for-the-badge" alt="discord">
@@ -9,6 +8,9 @@
 	</a>
 	<a href="https://poggit.pmmp.io/ci/GamakCZ/Dragons/Dragons">
 	        <img src="https://poggit.pmmp.io/ci.shield/GamakCZ/Dragons/Dragons?style=for-the-badge" alt="poggit-ci">
+	</a>
+	<a href="https://poggit.pmmp.io/ci/GamakCZ/Dragons/Dragons">
+	        <img src="https://poggit.pmmp.io/shield.state/Dragons?style=for-the-badge" alt="poggit-ci">
 	</a>
 <br><br>
 ✔ Simple setup<br>
