@@ -493,7 +493,7 @@ class Arena implements Listener {
     }
 
     public function endGame() {
-        /** @var Player $winner */
+        /** @var Player|null $winner */
         $winner = null;
         foreach ($this->players as $player) {
             $winner = $player;
