@@ -50,5 +50,5 @@
 	<h2>Credits</h2>
 </div>
 
-- This plugin was created because of [PatarHD's]() 24hours coding competition. Although I had 36 hours of time for making the plugin (because of increase), I had finished it within 16 hours and 40 minutes. So if I wanted, I would have 20 hours more for coding :smile:.
+- This plugin was created because of [PatarHD's](https://www.youtube.com/user/Patarhd123) 24hours coding competition. Although I had 36 hours of time for making the plugin (because of increase), I had finished it within 16 hours and 40 minutes. So if I wanted, I would have 20 hours more for coding :smile:.
 - And ass usual... Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a>
