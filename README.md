@@ -30,7 +30,7 @@
  3. Restart the server
 
 -  <h3>Create and setup an arena:</h3>
-1. Create an arena using `/sw create`
+1. Create an arena using `/dg create`
 2. Then follow setup instructions
 
 <div align="center">
