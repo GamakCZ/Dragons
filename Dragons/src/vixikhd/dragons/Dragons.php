@@ -388,6 +388,7 @@ class Dragons extends PluginBase implements Listener {
                 $arena = new Arena($this, $this->setup[$player->getName()]);
 
                 $this->arenas[] = $arena;
+				$this->saveArenas();
                 $player->sendMessage("§a> Arena saved!");
                 $event->setCancelled(true);
 

@@ -3,7 +3,10 @@
 # This plugin was created because of PatarHD Youtuber, sub to him for more awesome plugins!
 
 # Don't change config version!
-config-version: '1.0.0'
+config-version: '1.1.0'
+
+#Minimum players to start a game
+minPlayersToStart: 4
 
 # This option autoconnects players when join, it also disables signs
 waterdog:

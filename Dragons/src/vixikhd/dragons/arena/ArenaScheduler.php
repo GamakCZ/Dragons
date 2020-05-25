@@ -22,8 +22,9 @@ class ArenaScheduler extends Task {
 
     public const START_TIME = 40; // TODO - Change start time
     public const RESTART_TIME = 10;
-
-    public const PLAYERS_TO_START = 4;
+	
+	/** @var int $playersToStart */
+    public $playersToStart = 4;
 
     /** @var Arena $plugin */
     public $plugin;
@@ -47,6 +48,7 @@ class ArenaScheduler extends Task {
      */
     public function __construct(Arena $plugin) {
         $this->plugin = $plugin;
+		$this->playersToStart = $this->plugin->plugin->config["minPlayersToStart"];
     }
 
     /**
@@ -55,10 +57,9 @@ class ArenaScheduler extends Task {
     public function onRun(int $currentTick) {
         $this->sendScoreboard();
         $this->refreshSign();
-
         switch ($this->phase) {
             case 0:
-                if(count($this->plugin->players) < self::PLAYERS_TO_START && !$this->forceStart) {
+                if(count($this->plugin->players) < $this->playersToStart && !$this->forceStart) {
                     $this->plugin->broadcastTip(Lang::getMessage("waiting", [(string)count($this->plugin->players), $this->plugin->data["slots"]]));
                     break;
                 }
@@ -157,7 +158,7 @@ class ArenaScheduler extends Task {
 
         $scoreboardSettings = $this->plugin->plugin->config["scoreboards"];
         if(!$scoreboardSettings["enabled"]) {
-            var_dump($scoreboardSettings);
+            // var_dump($scoreboardSettings);
             return;
         }
 
@@ -192,7 +193,7 @@ class ArenaScheduler extends Task {
 
         switch ($this->phase) {
             case 0:
-                if(count($this->plugin->players) < self::PLAYERS_TO_START) {
+                if(count($this->plugin->players) < $this-playersToStart) {
                     foreach ($this->plugin->players as $player) {
                         ScoreboardBuilder::removeBoard($player);
                         ScoreboardBuilder::sendBoard($player, str_replace(
