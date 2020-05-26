@@ -400,9 +400,16 @@ class Dragons extends PluginBase implements Listener {
      * @param LeavesDecayEvent $event
      */
     public function onDecay(LeavesDecayEvent $event) {
-        if($this->config["cancel-level-events"]) {
-            $event->setCancelled(true);
-        }
+	    if(Dragons::getInstance()->config["cancel-level-events"]) {
+			$arenas = array_map(function ($arena) {
+			/** @var Arena $arena */
+				return $arena->level === null ? "Unknown" : $arena->level->getName();
+			}, Dragons::getInstance()->arenas);
+
+			if (in_array($event->getBlock()->getLevel()->getName(),$arenas)) {
+				$event->setCancelled(true);
+			}
+		}
     }
 
     /**
