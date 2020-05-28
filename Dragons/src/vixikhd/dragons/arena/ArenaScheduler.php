@@ -193,7 +193,7 @@ class ArenaScheduler extends Task {
 
         switch ($this->phase) {
             case 0:
-                if(count($this->plugin->players) < $this-playersToStart) {
+                if(count($this->plugin->players) < $this->playersToStart) {
                     foreach ($this->plugin->players as $player) {
                         ScoreboardBuilder::removeBoard($player);
                         ScoreboardBuilder::sendBoard($player, str_replace(
