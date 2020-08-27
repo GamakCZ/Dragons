@@ -153,10 +153,6 @@ class Dragons extends PluginBase implements Listener {
      * @return bool
      */
     public function onCommand(CommandSender $sender, Command $command, string $label, array $args): bool {
-        if(!$sender instanceof Player) {
-            return false;
-        }
-
         if(!$sender->isOp()) {
             return false;
         }
@@ -177,9 +173,13 @@ class Dragons extends PluginBase implements Listener {
                     "§a/dg create : Creates an arena\n".
                     "§a/dg list : Displays list of available arenas\n".
                     "§a/dg remove : Removes an arena\n".
-                    "§a/dg start : Force starts a game");
+                    "§a/dg start : Force starts a game\n".
+                    "§a/dg random : Connects player to random game");
                 break;
             case "create":
+                if(!$sender instanceof Player) {
+                    return false;
+                }
                 $sender->sendMessage("§a> Arena created!");
                 $this->setup[$sender->getName()] = [];
                 $sender->sendMessage("§6> Go to lobby level and write something to chat!");
@@ -221,6 +221,9 @@ class Dragons extends PluginBase implements Listener {
                 $sender->sendMessage("§a> Arena successfully removed!");
                 break;
             case "start":
+                if(!$sender instanceof Player) {
+                    return false;
+                }
                 $arena = $this->getArenaByPlayer($sender);
                 if($arena === null) {
                     $sender->sendMessage("§c> Join the arena first!");
@@ -230,7 +233,26 @@ class Dragons extends PluginBase implements Listener {
                 $arena->scheduler->startTime = 10;
                 $arena->scheduler->forceStart = true;
                 $sender->sendMessage("§a> Starting the game...");
+                break;
+            case "random":
+                if(!isset($args[1])) {
+                    $sender->sendMessage("§cUsage: §7/dg random <player>");
+                    break;
+                }
 
+                $player = $this->getServer()->getPlayer($args[1]);
+                if($player === null) {
+                    $sender->sendMessage("§c> Player not found!");
+                    break;
+                }
+
+                $arena = $this->emptyArenaChooser->getRandomArena();
+                if($arena === null) {
+                    $player->sendMessage("§c> There isn't any empty arena.");
+                    break;
+                }
+
+                $arena->joinToArena($player);
         }
         return false;
     }
