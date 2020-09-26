@@ -157,7 +157,7 @@ class Arena implements Listener {
 
         $player->setGamemode($this->plugin->getServer()->getDefaultGamemode());
 
-        ScoreboardBuilder::removeBoard($player);
+        ScoreboardBuilder::removeScoreBoard($player);
 
         if($findNewGame) {
             $arena = $this->plugin->emptyArenaChooser->getRandomArena();

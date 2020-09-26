@@ -195,8 +195,7 @@ class ArenaScheduler extends Task {
             case 0:
                 if(count($this->plugin->players) < $this->playersToStart) {
                     foreach ($this->plugin->players as $player) {
-                        ScoreboardBuilder::removeBoard($player);
-                        ScoreboardBuilder::sendBoard($player, str_replace(
+                        ScoreboardBuilder::sendScoreBoard($player, str_replace(
                             ["{%kit}"],
                             [$getKit($this->plugin->plugin, $player)],
                             $replaceDefault($scoreboardSettings["formats"]["waiting"], $map)
@@ -205,8 +204,7 @@ class ArenaScheduler extends Task {
                 }
                 else {
                     foreach ($this->plugin->players as $player) {
-                        ScoreboardBuilder::removeBoard($player);
-                        ScoreboardBuilder::sendBoard($player, str_replace(
+                        ScoreboardBuilder::sendScoreBoard($player, str_replace(
                             ["{%kit}", "{%startTime}"],
                             [$getKit($this->plugin->plugin, $player), gmdate("i:s", $this->startTime)],
                             $replaceDefault($scoreboardSettings["formats"]["starting"], $map)
@@ -217,8 +215,7 @@ class ArenaScheduler extends Task {
             case 1:
                 $players = $this->plugin->players + $this->plugin->spectators; // Did you try this already? xd
                 foreach ($players as $player) {
-                    ScoreboardBuilder::removeBoard($player);
-                    ScoreboardBuilder::sendBoard($player, str_replace(
+                    ScoreboardBuilder::sendScoreBoard($player, str_replace(
                         ["{%kit}", "{%gameTime}"],
                         [$getKit($this->plugin->plugin, $player), gmdate("i:s", $this->gameTime)],
                         $replaceDefault($scoreboardSettings["formats"]["playing"], $map)
@@ -228,8 +225,7 @@ class ArenaScheduler extends Task {
             case 2:
                 $players = $this->plugin->players + $this->plugin->spectators;
                 foreach ($players as $player) {
-                    ScoreboardBuilder::removeBoard($player);
-                    ScoreboardBuilder::sendBoard($player, str_replace(
+                    ScoreboardBuilder::sendScoreBoard($player, str_replace(
                         ["{%kit}", "{%restartTime}"],
                         [$getKit($this->plugin->plugin, $player), gmdate("i:s", $this->restartTime)],
                         $replaceDefault($scoreboardSettings["formats"]["restarting"], $map)
