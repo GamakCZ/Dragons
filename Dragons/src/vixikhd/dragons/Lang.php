@@ -33,7 +33,7 @@ class Lang {
     public static function getMessage(string $index, array $params = []): string {
         $message = self::$messages[$index] ?? "unknown";
         foreach ($params as $i => $param) {
-            $message = str_replace("{%$i}", $param, $message);
+            $message = str_replace("{%$i}", (string) $param, $message);
         }
 
         return $message;
